@@ -3,10 +3,12 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import mediapipe as mp
+from pprint import pprint
 
 
 # todo
 # change it so instead of grabbing first frame, do first frame with 2 hands in it (low priority)
+# add outlier detection for video lengths to get manual inspection (medium priority)
 
 
 def extract_first_frame(video_filename: str) -> np.ndarray:
@@ -138,7 +140,7 @@ def detect_hands(image) -> tuple[np.ndarray, tuple[tuple[int, ...], tuple[int, .
 
             # Draw the hand landmarks
             mp_drawing.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-            print(f"HAND n dims:\n"
+            print(f"HAND DETECTED:\n"
                   f"x: ({x_min}, {x_max}), y: x in ({y_min}, {y_max})")
 
             # add boundary to output
@@ -383,8 +385,8 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple) ->
     if not os.path.isfile(video_filename):
         raise FileNotFoundError(f"The video file '{video_filename}' does not exist.")
 
-    import ffmpeg
-    temp_filename = "temp_video.mp4"
+    # import ffmpeg
+    # temp_filename = "temp_video.mp4"
 
     cap = cv2.VideoCapture(video_filename)
 
@@ -396,7 +398,7 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple) ->
     (min_x, max_x), (min_y, max_y) = crop_region
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(temp_filename,  # change to temp_filename for vid
+    out = cv2.VideoWriter(output_filename,  # change to "temp_filename" for vid
                           fourcc,
                           fps,
                           (max_x - min_x, max_y - min_y))
@@ -428,58 +430,55 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple) ->
         out.write(blank_frame)
 
     # Adding audio from the original clip to the cropped video using ffmpeg-python
-    input_video = ffmpeg.input(temp_filename)
-    input_audio = ffmpeg.input(video_filename)
+    # input_video = ffmpeg.input(temp_filename)
+    # input_audio = ffmpeg.input(video_filename)
 
-    ffmpeg.output(input_video.video, input_audio.audio, output_filename).run()
+    # ffmpeg.output(input_video.video, input_audio.audio, output_filename).run()
 
     # Remove the temporary video file
-    os.remove(temp_filename)
+    # os.remove(temp_filename)
 
     print(f"The video has been cropped and saved to '{output_filename}'")
 
 
-def zoom_video(input_file_path, crop_region, output_file_path):
-    """
-    Zooms the video to the specified crop region while retaining the original audio.
-
-    :param input_file_path: str, path to the input video file.
-    :param crop_region: tuple, pixel coordinates for the crop region in the format ((min_x, max_x), (min_y, max_y)).
-    :param output_file_path: str, path to save the output zoomed video file.
-    """
-    # os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
-    # from moviepy.editor import VideoFileClip
-    import ffmpeg
-
-
-    input_video = ffmpeg.input(input_file_path)
-    print("done vid")
-    input_audio = ffmpeg.input(input_file_path)
-
-    print(type(input_video), type(input_audio))
-
-    print("done aud")
-    ffmpeg.concat(input_video, input_audio, v=1, a=1).output('./processed_folder/finished_video.mp4').run()
-    print("done conc")
-
-    # Load the video clip
-    clip = VideoFileClip(input_file_path)
-
-    # Extract the crop region coordinates
-    min_x, max_x = crop_region[0]
-    min_y, max_y = crop_region[1]
-
-    # Crop the video to the specified region
-    cropped_clip = clip.crop(x1=min_x, y1=min_y, x2=max_x, y2=max_y)
-
-    # Set the audio of the cropped clip as the original audio
-    cropped_clip = cropped_clip.set_audio(clip.audio)
-
-    # Write the zoomed video file to the specified output path
-    cropped_clip.write_videofile(output_file_path, codec='libx264', audio_codec='aac')
-
-
-
+# def zoom_video(input_file_path, crop_region, output_file_path):
+#     """
+#     Zooms the video to the specified crop region while retaining the original audio.
+#
+#     :param input_file_path: str, path to the input video file.
+#     :param crop_region: tuple, pixel coordinates for the crop region in the format ((min_x, max_x), (min_y, max_y)).
+#     :param output_file_path: str, path to save the output zoomed video file.
+#     """
+#     # os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+#     # from moviepy.editor import VideoFileClip
+#     import ffmpeg
+#
+#
+#     input_video = ffmpeg.input(input_file_path)
+#     print("done vid")
+#     input_audio = ffmpeg.input(input_file_path)
+#
+#     print(type(input_video), type(input_audio))
+#
+#     print("done aud")
+#     ffmpeg.concat(input_video, input_audio, v=1, a=1).output('./processed_folder/finished_video.mp4').run()
+#     print("done conc")
+#
+#     # Load the video clip
+#     clip = VideoFileClip(input_file_path)
+#
+#     # Extract the crop region coordinates
+#     min_x, max_x = crop_region[0]
+#     min_y, max_y = crop_region[1]
+#
+#     # Crop the video to the specified region
+#     cropped_clip = clip.crop(x1=min_x, y1=min_y, x2=max_x, y2=max_y)
+#
+#     # Set the audio of the cropped clip as the original audio
+#     cropped_clip = cropped_clip.set_audio(clip.audio)
+#
+#     # Write the zoomed video file to the specified output path
+#     cropped_clip.write_videofile(output_file_path, codec='libx264', audio_codec='aac')
 
 
 def crop_vid_full(vid_name: str, output_name: str) -> None:
@@ -507,8 +506,288 @@ def crop_vid_full(vid_name: str, output_name: str) -> None:
     # import time
     # time.sleep(5)
     crop_video(vid_name, output_name, bounds_sized)
-    # zoom_video(vid_name, bounds_sized, output_name)
+    print(f"")
+
+
+############################################# NOW LENGTH #############################################
+
+# Define the lower and upper bounds of the blue color in HSV
+LOWER_BLUE = np.array([90, 50, 50])
+UPPER_BLUE = np.array([130, 255, 255])
+
+
+def load_cv_vid(filepath: str) -> cv2.VideoCapture:
+    return cv2.VideoCapture(filepath)
+
+
+def count_blue_pixels_in_video(cap: cv2.VideoCapture, lower_blue: np.ndarray, upper_blue: np.ndarray) -> np.ndarray:
+    """
+    Counts the number of blue pixels in each frame of a video.
+
+    Args:
+        cap (cv2.VideoCapture): The video capture object.
+        lower_blue (np.ndarray): The lower bound of the blue color in HSV.
+        upper_blue (np.ndarray): The upper bound of the blue color in HSV.
+
+    Returns:
+        np.ndarray: A 1D array containing the count of blue pixels for each frame.
+
+    Raises:
+        IOError
+    """
+
+    # Check if the video capture object is opened successfully
+    if not cap.isOpened():
+        raise ValueError("Video file not opened")
+
+    # Initialize an empty list to store the count of blue pixels for each frame
+    blue_pixel_counts = []
+
+    actual_frame_count = 0
+
+    # Loop through the video frames
+    while True:
+        # Read the next frame from the video
+        ret, frame = cap.read()
+
+        # If the frame was not grabbed, then we have reached the end of the video
+        if not ret:
+            break
+
+        # Convert the frame to HSV color space
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Create a binary mask for the blue color
+        blue_mask = cv2.inRange(hsv_frame, lower_blue, upper_blue)
+
+        # Count the number of non-zero pixels in the mask (blue pixels in the original frame)
+        num_blue_pixels = cv2.countNonZero(blue_mask)
+
+        # Append the count to the list
+        blue_pixel_counts.append(num_blue_pixels)
+
+        actual_frame_count += 1
+
+    # Release the video capture object
+    # cap.release()
+    # print(f"Actual frame count processed: {actual_frame_count}")
+    # Convert the list of blue pixel counts to a 1D NumPy array and return it
+    return np.array(blue_pixel_counts)
+
+
+def local_max_avg_threshold(arr, avg_multiple: float = 1.5, padding: int = 70) -> np.ndarray:
+    """
+    Find the indices of maximum values in intervals that exceed a specified multiple of the average value.
+
+    Args:
+        arr (np.ndarray): The input NumPy array containing the data.
+        avg_multiple (float, optional): The multiple of the average value used as the threshold. Default is 1.5.
+        padding (int, optional): The number of elements to consider as padding. If a new maximum is found
+            within this range of a previous maximum, it will not be counted. Default is 0.
+
+    Returns:
+        np.ndarray: An array containing the indices of maximum values within intervals exceeding the threshold.
+    """
+    # Calculate the threshold as a multiple of the average
+    threshold = avg_multiple * np.mean(arr)
+
+    # Initialize variables to keep track of intervals
+    start = None
+    max_indices = []
+
+    for i, value in enumerate(arr):
+        if value > threshold:
+            if start is None:
+                start = i
+            elif i == len(arr) - 1:
+                # Handle the case when the interval extends to the end of the array
+                end = i
+                interval = arr[start:end + 1]
+                max_index = start + np.argmax(interval)
+                if not max_indices or max_index - max_indices[-1] > padding:
+                    max_indices.append(max_index)
+        elif start is not None:
+            end = i - 1
+            interval = arr[start:end + 1]
+            max_index = start + np.argmax(interval)
+            if not max_indices or max_index - max_indices[-1] > padding:
+                max_indices.append(max_index)
+            start = None
+
+    return np.array(max_indices)
+
+
+def split_video(cap: cv2.VideoCapture, split_frame_indices: np.ndarray, output_dir: str = "split_clips") -> None:
+    """
+    Splits a video into multiple segments based on the provided split frame indices.
+
+    Args:
+        cap (cv2.VideoCapture): Input video file.
+        split_frame_indices (np.ndarray): 1D array containing the indices of the split frames.
+        output_dir (str): Directory where the split videos will be saved. Defaults to "split_clips"
+
+    Returns:
+        None. Video segments are saved to the specified output directory.
+    """
+    # Check if the video capture object is opened successfully
+    if not cap.isOpened():
+        raise ValueError("Video file not opened")
+
+    # Get the codec information of the input video
+    # fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))  # specifying mp4v doesn't cause warning
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+
+    # Get characteristics of the input video
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # Ensure the output directory exists
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Initialize the start frame index for the first segment
+    start_frame_idx = 0
+
+    # Iterate over the split frame indices to create video segments
+    for i, split_frame_idx in enumerate(np.append(split_frame_indices, int(cap.get(cv2.CAP_PROP_FRAME_COUNT)))):
+        # Define the output video path for the current segment
+        output_video_path = os.path.join(output_dir, f"segment_{i + 1}.mp4")
+
+        # Initialize the video writer object
+        out = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_width, frame_height))
+
+        # Write frames to the output video segment
+        for frame_idx in range(start_frame_idx, split_frame_idx):
+            ret, frame = cap.read()
+            if not ret:
+                break
+            out.write(frame)
+
+        # Release the video writer object
+        out.release()
+
+        # Update the start frame index for the next segment
+        start_frame_idx = split_frame_idx
+
+    # Release the video capture object
+    cap.release()
+    print(f"Split video segments have been saved to {output_dir}")
+
+
+def get_video_lengths(directory: str) -> dict:
+    """
+    Retrieves the duration (in seconds) of all video files within a specified directory.
+
+    Walks through the provided directory and its subdirectories, identifies video files with
+    common extensions (e.g., .mp4, .avi, .mkv), and calculates the duration of each video using OpenCV's
+    cv2.VideoCapture module.
+
+    Args:
+        directory (str): The path to the directory containing video files.
+
+    Returns:
+        dict: A dictionary where keys are the full paths to video files and values are their respective
+        durations in seconds.
+
+    Raises:
+        Exception: If there is an error while processing any video file, such as inability to open the file
+        or retrieve its properties, an exception is raised with an error message.
+
+    Example:
+        If you have a directory '/path/to/your/video/directory' containing video files:
+
+        >>> directory_path = "/path/to/your/video/directory"
+        >>> video_lengths = get_video_lengths(directory_path)
+
+        The 'video_lengths' dictionary will contain video file paths as keys and their durations in seconds as values.
+        You can then iterate through the dictionary to access the information:
+
+        >>> for video_path, duration in video_lengths.items():
+        ...     print(f"{video_path}: {duration:.2f} seconds")
+    """
+    video_lengths = {}
+
+    for root, _, files in os.walk(directory):
+        for filename in files:
+            if filename.endswith(('.mp4', '.avi', '.mkv', '.mov', '.wmv')):
+                video_path = os.path.join(root, filename)
+
+                try:
+                    cap = cv2.VideoCapture(video_path)
+
+                    # Get the frame count and frame rate to calculate duration
+                    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                    frame_rate = int(cap.get(cv2.CAP_PROP_FPS))
+                    duration = frame_count / frame_rate
+
+                    # Store the duration in the dictionary
+                    video_lengths[video_path] = duration
+
+                    # Release the video capture object
+                    cap.release()
+                except Exception as e:
+                    print(f"Error while processing {video_path}: {str(e)}")
+
+    return video_lengths
+
+
+def full_length_split(vid_dir: str) -> None:
+    """
+        ONLY FUNCTION IN THIS FILE FOR EXTERNAL USE\n
+        Given the name of a video, crops it
+
+        Args:
+            vid_dir (str): The path to the input video file.
+
+        Returns:
+            None
+        """
+    # determine where to split based on blue pixels (from blue latex glove)
+    cap_out = cv2.VideoCapture(vid_dir)
+    blue_pixel_counts = count_blue_pixels_in_video(cap=cap_out, lower_blue=LOWER_BLUE, upper_blue=UPPER_BLUE)
+    max_indices = local_max_avg_threshold(blue_pixel_counts, avg_multiple=2, padding=70)
+    cap_out.release()
+
+    # split videos
+    vid_name, _ = os.path.splitext(vid_dir)
+    output_dir = vid_name + "_clips"
+
+    cap_out = cv2.VideoCapture(vid_dir)
+    split_video(cap_out,
+                max_indices[1::2],  # every other index because hand enters and leaves once per desired split
+                output_dir)
+    cap_out.release()
+
+    # inspect video lengths
+    vid_lengths = get_video_lengths(output_dir)
+    print(f"CLIP LENGTHS OF {vid_dir}:\n")
+    pprint(vid_lengths)
+
+    # extra stuff to analyze outliers eventually
+    # durations = np.array([duration for _, duration in sorted(vid_lengths.items())][2:])
+    #
+    # mean = np.mean(durations)
+    # std_dev = np.std(durations)
+    #
+    # # Plot the histogram
+    # plt.hist(durations, bins=20)
+    # plt.xlabel('Duration')
+    # plt.ylabel('Frequency')
+    # plt.title('Histogram of Durations')
+    # plt.axvline(mean, color='r', linestyle='dashed', linewidth=2, label=f'Mean ({mean:.2f})')
+    # plt.legend()
+    # plt.show()
+    #
+    # # Print 1 SD from the mean and 2 SD from the mean
+    # one_std_above_mean = mean + std_dev
+    # two_std_above_mean = mean + 2 * std_dev
+    #
+    # print(f'1 SD from the mean: {one_std_above_mean:.2f}')
+    # print(f'2 SD from the mean: {two_std_above_mean:.2f}')
 
 
 if __name__ == '__main__':
-    crop_vid_full("mine_shortened_no_crop.mp4", "tmp1.mp4")
+    output_file = "full_pipeline_1/full_test_1.mp4"
+    crop_vid_full("whole_thing_no_crop.mp4", output_file)
+    full_length_split(output_file)
