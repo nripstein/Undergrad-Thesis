@@ -1,6 +1,14 @@
-# Undergrad-Thesis
-Code for Undergraduate Senior Honours Thesis in Goldreich Lab.  I'm developing a computer vision program which can automatically detect how long participants are holding an object in videos
+<H1>AI Computer Vision Software for Undergrad Thesis</H1>
+This repository contains code for my Undergraduate Senior Honours Thesis in the <a href="https://pnb.mcmaster.ca/goldreich-lab/CurrentRes.html#Modeling">Goldreich Lab</a>. I'm developing a computer vision program which can automatically detect how long participants are holding an object in videos. 
 
+
+<div align="center">
+  <H3>Proof of Concept Video</H3>
+  <img src="https://github.com/nripstein/Undergrad-Thesis/assets/98430636/57cd803a-3eb8-490a-bf0a-eccc0afdff79" alt="36_prob_gif">
+  <p>AI displays probability that participant is touching grey object <em>(AI was not trained on this clip)</em></p>
+</div>
+
+<H1>Repository Table of Contents</H1>
 
 <h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/f4da48ca9171c976b927834e5edd429a2aac971c/vid_resize_experiments.ipynb">Auto-Zoom Jupyter Notebook</a></h2>
 <ul>
