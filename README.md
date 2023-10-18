@@ -41,11 +41,24 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <li>Easy function to extract frames from video</li>
   <li>Given transition frames (i.e. the first frame of object contact or object non-contact), can automatically label all remaining frames in video</li>
   <li>Saves tons of time labelling: labeller needs to carefully label 10 frames, and it sorts out the remaining 4000+ with perfect accuracy (accuracy guaranteed because it's rule-based, not machine learning-based)</li>
-  <li>TODO: likely done</li>
+  <li>TODO:</li>
+  <ul>
+  <li>Add support for edge cases: First or last frame are transition frames</li>
+  <li>More functionality for automatically labelling many videos at once</li>
+  </ul>
 </ul>
 <h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/629c88d6e1af0eada75d89550a93fd6de80fea4b/preprocess_pipeline.py">Preprocess Pipeline</a></h2>
 <ul>
   <li>.py file to automatically preprocess videos including auto-zoom and auto-crop (as developed in the Jupyter Notebooks)</li>
   <li>TODO: likely done</li>
 </ul>
+
+<H1>Future directions</H1>
+<ol>
+<li>Need to perform time series analysis for changepoint detection. Will likely detect changepoint if p(touching) makes a huge jump. </li>
+</ol>
+
+<ul>
+  <li>MAYBE: Add model which detects clearly visible object with no contact. Then can do similar time series analysis on current type of model (which detects probability of contact in a given frame) and then do ensemble learning. Ideally each model would have good reliability, but together would be very reliable</li>
+  </ul>
 
