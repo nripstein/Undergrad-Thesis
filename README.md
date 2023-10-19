@@ -8,6 +8,12 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <p>AI displays probability that participant is touching grey object <em>(AI was not trained on this clip)</em></p>
 </div>
 
+<div align="center">
+  <H3>Proof of Concept Multi-Trial Labelling</H3>
+  <img src="https://github.com/nripstein/Undergrad-Thesis/assets/98430636/e86df995-8077-45a6-8fb8-ea3ff3b7cd91" alt="36_prob_gif">
+  <p>Predicted contact duration using simple threshold decision rule. Each shaded region represents duration of a different trial <em>(AI was not trained on this portion of video)</em></p>
+</div>
+
 <H1>Repository Table of Contents</H1>
 
 <h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/f4da48ca9171c976b927834e5edd429a2aac971c/vid_resize_experiments.ipynb">Auto-Zoom Jupyter Notebook</a></h2>
@@ -58,7 +64,13 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
 <li>Need to perform time series analysis for changepoint detection. Will likely detect changepoint if p(touching) makes a huge jump. </li>
 </ol>
 
+<H1>Possible Future directions</H1>
 <ul>
-  <li>MAYBE: Add model which detects clearly visible object with no contact. Then can do similar time series analysis on current type of model (which detects probability of contact in a given frame) and then do ensemble learning. Ideally each model would have good reliability, but together would be very reliable</li>
+  <li>MAYBE: Add model which detects clearly visible object with no contact. Then can do similar time series analysis on current type of model (which detects probability of contact in a given frame) and then do ensemble learning. Ideally each model would have good reliability, but together would be very reliable.</li>
+  <ul><li>Could do this with another image classification model or maybe with image segmentation</li></ul>
+  <li>MAYBE: develop some sort of custom loss function for video duration prediction so I can make a very custom time series segmentation model, probably with a neural network. No real details worked out at this point.</li>
+  <ul>
+  <li>Could run into same dual training set problem as in Hidden Markov model</li>
+  <li>This would probably be extremely interesting, but might constitute graduate-level machine learning research if done properly and would be too much on top of the other aspects of my thesis.</li>
   </ul>
-
+  </ul>
