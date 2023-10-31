@@ -59,9 +59,24 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <li>TODO: likely done</li>
 </ul>
 
-<H1>Future directions</H1>
+
+<H1>TODO Before Deployment</H1>
 <ol>
-<li>Need to perform time series analysis for changepoint detection. Will likely detect changepoint if p(touching) makes a huge jump. </li>
+<li>Develop program to automatically get ground truth duration labels for labeled data</li>
+<li>Perform time series analysis for changepoint detection. Will likely detect changepoint if p(touching) makes a huge jump.  Current basic solution is that a touch is counted if a confidence threshold is exceeded, but this likely is less robust than more sophisticated changepoint detection. 
+<ul>
+<li>
+Formalizing as a Hidden Markov Model (with <a href="https://en.wikipedia.org/wiki/Baum%E2%80%93Welch_algorithm">Baum–Welch algorithm</a>
+ for segmentation) is a possibility, but I'd need labeled training sets which the model isn't trained on to find transition probabilities, which is probably not a great use of resources if I can avoid it.</li>
+</ul>
+</li>
+<li>Need to make program to automatically extract predicted duration labels</li>
+<li>Need to figure out how to deal with pre-zoomed videos in wrong aspect ratio
+<ul>
+<li>probably slice off the top. Maybe if aspect ratio more extreme than x, do top slice + some bottom slice and or white pixels around edges</li>
+</ul>
+</li>
+<li>Need to retrain model using EfficentNetB7 for maximum strength (current model is EfficientNetB0)</li>
 </ol>
 
 <H1>Possible Future directions</H1>
@@ -74,3 +89,4 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <li>This would probably be extremely interesting, but might constitute graduate-level machine learning research if done properly and would be too much on top of the other aspects of my thesis.</li>
   </ul>
   </ul>
+
