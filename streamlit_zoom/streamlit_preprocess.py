@@ -9,7 +9,7 @@ import zipfile
 
 # streamlit run streamlit_zoom/streamlit_preprocess.py --server.maxUploadSize 1024 # run this in terminal for local running
 
-st.set_page_config(page_title="Labelling Prep")  # Set tab title
+st.set_page_config(page_title="Data Preprocessing")  # Set tab title
 
 # Hide hamburger menu and Streamlit watermark
 hide_streamlit_style = """
@@ -256,7 +256,7 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple, ve
     out.release()
 
     print(f"{video_filename} has been cropped and saved to '{output_filename}'")
-    st.success(f"{video_filename} has been cropped and saved to '{output_filename}'")
+    # st.success(f"{video_filename} has been cropped and saved to '{output_filename}'")
 
     progress_bar.progress(100, "Cropping complete")
 
@@ -335,7 +335,7 @@ def crop_and_extract(video_filename: str, output_filename: str, crop_region: tup
     cap.release()
 
     print(f"{video_filename} has been cropped and extracted, saved to '{output_filename}'")
-    st.success(f"{video_filename} has been cropped and extracted, saved to '{output_filename}'")
+    # st.success(f"{video_filename} has been cropped and extracted, saved to '{output_filename}'")
 
     progress_bar.progress(100, "Cropping and extracting complete")
     return generated_files
@@ -421,13 +421,6 @@ def frame_with_detected_hands(video_path: str, n: int = 2) -> tuple[int, int]:
         return frame_with_one, 1
 
 
-def create_zip_file_old(file_paths, zip_file_path):
-    with zipfile.ZipFile(zip_file_path, 'w') as zipf:
-        for file in file_paths:
-            zipf.write(file, os.path.basename(file))
-    st.success("done making zip old")
-
-
 def create_zip_file(file_paths: list[str], zip_file_path: str) -> None:
     """
        Creates a zip file containing a specified list of files. The zip file includes a dedicated
@@ -472,7 +465,6 @@ def create_zip_file(file_paths: list[str], zip_file_path: str) -> None:
             frame_name = os.path.basename(file)
             frame_path = os.path.join(frame_dir, frame_name)
             zipf.write(file, frame_path)
-    st.success("done making zip new")
 
 
 if 'count' not in st.session_state:
@@ -484,18 +476,34 @@ def st_increment_counter():
 
 
 # --------------------------------------- SideBar ---------------------------------------
-st.sidebar.title("Haptic Categorization Video Preprocess Tool")
-
+st.sidebar.title("Haptic Categorization Video Preprocessing")
 st.sidebar.markdown('''
+<H2>This tool can:</H2>
 
-1. Locate Hands
-2. Preview zoom-in centered on hands
-3. Perform previewed zoom-in
-4. Extract frames, prepare for frame labelling (Coming soon)
+1. Create a cropped video centered on hands
+2. Extract frames from video so they can be labeled for AI training
 
-''')
+''', unsafe_allow_html=True)
+st.sidebar.markdown("<H2>How to Use:</H2>", unsafe_allow_html=True)
+st.sidebar.markdown('''
+<ol>
+    <li>Upload a video</li>
+    <li>Hands will be automatically located</li>
+    <li>Preview zoom-in centered on hands</li>
+    <li>Click "Crop Video" if you want a cropped video or "Extract Frames" if you're labelling for AI training</li>
+    <li>Download files when prompted</li>
+</ol>
+''', unsafe_allow_html=True)
+st.sidebar.markdown("<H2>Notes and How it Works:</H2>", unsafe_allow_html=True)
+st.sidebar.markdown('''
+<ul>
+    <li>The software scans each frame in the uploaded video until it finds one where 2 hands can be identified. If there are no such frames, it settles for the first frame where 1 hand is found.</li>
+    <li>When uploading a new video, you <em>must</em> click "Reset Session and Hand Detection" to automatically locate hands in the new video</li>
+</ul>
+''', unsafe_allow_html=True)
 
-st.sidebar.markdown("Created by [**Noah Ripstein**](https://www.noahripstein.com)")
+
+st.sidebar.markdown("Created by [**Noah Ripstein**](https://www.noahripstein.com) for the [**Goldreich Lab**](https://pnb.mcmaster.ca/goldreich-lab/CurrentRes.html)")
 
 
 # --------------------------------------- Main Body ---------------------------------------
@@ -514,7 +522,7 @@ if uploaded_video is not None:
             st.session_state["found_hands"] = found_hands
 
     # add buttons
-    frame_num = st.number_input("Enter Frame Number", min_value=1, value=st.session_state["selected_frame"] + 1, step=1)
+    frame_num = st.number_input("Enter Frame With Detected Hands", min_value=1, value=st.session_state["selected_frame"] + 1, step=1)
     flip = st.checkbox("Flip Vertically", on_change=st_increment_counter)
 
     if st.button("Reset Session and Hand Detection"):
