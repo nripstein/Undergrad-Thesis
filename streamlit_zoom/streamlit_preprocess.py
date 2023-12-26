@@ -569,7 +569,6 @@ if uploaded_video is not None:
     if st.button("Extract Frames"):
         with tempfile.TemporaryDirectory() as tmp_frame_folder:
             output_path = tmp_frame_folder
-
             # Call function to process video and extract frames
             generated_files = crop_and_extract(tfile.name, output_path, bounds_sized, vert_flip=flip,
                                                suffix=os.path.splitext(uploaded_video.name)[0])
