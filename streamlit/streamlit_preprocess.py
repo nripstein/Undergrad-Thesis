@@ -7,7 +7,7 @@ from tqdm import tqdm
 import tempfile
 import zipfile
 
-# streamlit run streamlit_zoom/streamlit_preprocess.py --server.maxUploadSize 1024 # run this in terminal for local running
+# streamlit run streamlit/streamlit_preprocess.py --server.maxUploadSize 1024 # run this in terminal for local running
 
 st.set_page_config(page_title="Data Preprocessing")  # Set tab title
 
@@ -566,12 +566,16 @@ if uploaded_video is not None:
                 mime="video/mp4"
             )
 
+    suffix = st.text_input("Suffix (frame files will be named <frameNum>_<suffix>})",
+                           value=os.path.splitext(uploaded_video.name)[0])
+
     if st.button("Extract Frames"):
+
         with tempfile.TemporaryDirectory() as tmp_frame_folder:
             output_path = tmp_frame_folder
             # Call function to process video and extract frames
             generated_files = crop_and_extract(tfile.name, output_path, bounds_sized, vert_flip=flip,
-                                               suffix=os.path.splitext(uploaded_video.name)[0])
+                                               suffix=suffix)
 
             if generated_files:
                 zip_file_path = f"{os.path.splitext(uploaded_video.name)[0]}_frames.zip"
