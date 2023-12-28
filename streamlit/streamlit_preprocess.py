@@ -183,7 +183,7 @@ def image_bounds_set_size_method(min_max_tuple: tuple, size_x: int = 652, size_y
     return x_bounds, y_bounds
 
 
-def crop_video(video_filename: str, output_filename: str, crop_region: tuple, vert_flip: bool = False) -> None:
+def crop_video(video_filename: str, output_filename: str, crop_region: tuple, vert_flip: bool = False, rotation: str = None) -> None:
     """
     Crops a video to a specified region.
 
@@ -193,6 +193,7 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple, ve
         crop_region (tuple): A tuple containing the pixel coordinates for the crop region
                              in the format ((min_x, max_x), (min_y, max_y)).
         vert_flip (bool): if True, then the video gets flipped vertically
+        rotation (str): ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise" for clockwise and ":arrow_right_hook: Rotate 90 degrees counterclockwise" for counterclockwise. Direct input from ratio putton
 
     Returns:
         None
@@ -244,12 +245,20 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple, ve
             if vert_flip:
                 cropped_frame = cv2.flip(cropped_frame, 0)
 
+            if rotation == ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise":
+                cropped_frame = cv2.rotate(cropped_frame, cv2.ROTATE_90_CLOCKWISE)
+            elif rotation == ":arrow_right_hook: Rotate 90 degrees counterclockwise":
+                cropped_frame = cv2.rotate(cropped_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
             # Write the cropped frame to the new video file
             out.write(cropped_frame)
             current_frame += 1
             progress_bar_tqdm.update(1)  # Update the tqdm progress bar
             progress_percent = min(1.0, current_frame / total_frames)
-            progress_bar.progress(progress_percent, f"{desc} {progress_percent*100:.2f}%")
+
+            itr_rate = progress_bar_tqdm.format_dict["rate"]
+            remaining = (progress_bar_tqdm.total - progress_bar_tqdm.n) / itr_rate if itr_rate and progress_bar_tqdm.total else 0
+            progress_bar.progress(progress_percent, f"{desc} {progress_percent*100:.2f}%. {remaining:.2f}s Remaining")
 
     # Release the VideoCapture and VideoWriter objects
     cap.release()
@@ -261,7 +270,7 @@ def crop_video(video_filename: str, output_filename: str, crop_region: tuple, ve
     progress_bar.progress(100, "Cropping complete")
 
 
-def crop_and_extract(video_filename: str, output_filename: str, crop_region: tuple, vert_flip: bool = False, suffix: str = None) -> list[str]:
+def crop_and_extract(video_filename: str, output_filename: str, crop_region: tuple, vert_flip: bool = False, suffix: str = None, rotation: str = None) -> list[str]:
     """
     Crops a video to a specified region. and extracts frames
 
@@ -272,6 +281,7 @@ def crop_and_extract(video_filename: str, output_filename: str, crop_region: tup
                              in the format ((min_x, max_x), (min_y, max_y)).
         vert_flip (bool): if True, then the video gets flipped vertically
         suffix (str): string containing suffix (excluding file extension) for frame file after frame number
+        rotation (str): ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise" for clockwise and ":arrow_right_hook: Rotate 90 degrees counterclockwise" for counterclockwise. Direct input from ratio putton
 
     Returns:
         list of files it created
@@ -322,6 +332,11 @@ def crop_and_extract(video_filename: str, output_filename: str, crop_region: tup
             if vert_flip:
                 cropped_frame = cv2.flip(cropped_frame, 0)
 
+            if rotation == ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise":
+                cropped_frame = cv2.rotate(cropped_frame, cv2.ROTATE_90_CLOCKWISE)
+            elif rotation == ":arrow_right_hook: Rotate 90 degrees counterclockwise":
+                cropped_frame = cv2.rotate(cropped_frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
             frame_path = os.path.join(output_filename, f'{current_frame}_{suffix}.jpg')
             cv2.imwrite(frame_path, cropped_frame)  # Save the current frame as an image file.
             generated_files.append(frame_path)
@@ -329,7 +344,10 @@ def crop_and_extract(video_filename: str, output_filename: str, crop_region: tup
             current_frame += 1
             progress_bar_tqdm.update(1)  # Update the tqdm progress bar
             progress_percent = min(1.0, current_frame / total_frames)
-            progress_bar.progress(progress_percent, f"{desc} {progress_percent*100:.2f}%")
+
+            itr_rate = progress_bar_tqdm.format_dict["rate"]
+            remaining = (progress_bar_tqdm.total - progress_bar_tqdm.n) / itr_rate if itr_rate and progress_bar_tqdm.total else 0
+            progress_bar.progress(progress_percent, f"{desc} {progress_percent * 100:.2f}%. {remaining:.2f}s Remaining")
 
     # Release the VideoCapture and VideoWriter objects
     cap.release()
@@ -491,6 +509,9 @@ st.sidebar.markdown('''
     <li>Hands will be automatically located</li>
     <li>Preview zoom-in centered on hands</li>
     <li>Click "Crop Video" if you want a cropped video or "Extract Frames" if you're labelling for AI training</li>
+        <ul>
+            <li>"Suffix" changes only affect extracting frames. Filename of each jpg: frame-number_suffix</li>
+        </ul>
     <li>Download files when prompted</li>
 </ol>
 ''', unsafe_allow_html=True)
@@ -523,7 +544,8 @@ if uploaded_video is not None:
 
     # add buttons
     frame_num = st.number_input("Enter Frame With Detected Hands", min_value=1, value=st.session_state["selected_frame"] + 1, step=1)
-    flip = st.checkbox("Flip Vertically", on_change=st_increment_counter)
+    flip = st.checkbox(":arrow_up_down: Flip Vertically", on_change=st_increment_counter)
+    rotate = st.radio("Rotation", ["No rotation", ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise", ":arrow_right_hook: Rotate 90 degrees counterclockwise"])
 
     if st.button("Reset Session and Hand Detection"):
         st.session_state["count"] = 0
@@ -549,13 +571,18 @@ if uploaded_video is not None:
     if flip:
         cropped_image = np.flipud(cropped_image)
 
+    if rotate == ":leftwards_arrow_with_hook: Rotate 90 degrees clockwise":
+        cropped_image = np.rot90(cropped_image, k=3, axes=(0, 1))
+    elif rotate == ":arrow_right_hook: Rotate 90 degrees counterclockwise":
+        cropped_image = np.rot90(cropped_image, k=1, axes=(0, 1))
+
     # Preview crop
     st.image(cropped_image, caption=f"Crop Preview: {st.session_state['found_hands']} hands detected", use_column_width=True, channels="BGR")
 
     if st.button("Crop Video"):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp_cropped_vid:
             output_path = tmp_cropped_vid.name
-        crop_video(tfile.name, output_path, bounds_sized, vert_flip=flip)
+        crop_video(tfile.name, output_path, bounds_sized, vert_flip=flip, rotation=rotate)
 
         # Provide the download button
         with open(output_path, "rb") as file:
@@ -575,7 +602,7 @@ if uploaded_video is not None:
             output_path = tmp_frame_folder
             # Call function to process video and extract frames
             generated_files = crop_and_extract(tfile.name, output_path, bounds_sized, vert_flip=flip,
-                                               suffix=suffix)
+                                               suffix=suffix, rotation=rotate)
 
             if generated_files:
                 zip_file_path = f"{os.path.splitext(uploaded_video.name)[0]}_frames.zip"
