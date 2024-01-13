@@ -1,4 +1,3 @@
-import os
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -27,9 +26,9 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # --------------------------------------- Functions ---------------------------------------
 
 @st.cache_resource(show_spinner=False)
-def load_model(model_dir: str = os.path.join(os.path.dirname(os.getcwd()), 'models', 'b0_2_epochs_half_data_h5.h5')) -> tf.keras.Model:
-    # tf_model = tf.keras.models.load_model(model_dir)
-    tf_model = tf.keras.models.load_model("models/b0_2_epochs_half_data_h5.h5")
+def load_model(model_dir: str = None) -> tf.keras.Model:
+    tf_model = tf.keras.models.load_model(model_dir) # "models/b0_2_epochs_half_data_h5.h5"
+    # tf_model = tf.keras.models.load_model("models/b0_2_epochs_half_data_h5.h5")
     return tf_model
 
 
@@ -213,7 +212,7 @@ def plotly_changepoint1(line_data, changepoints: list[int] = None, fps: float = 
     fig.update_layout(
         xaxis_title="Time (s)",
         yaxis_title="Value",
-        title=f"Probability of Contact"
+        title="Probability of Contact"
     )
 
     # Enable zooming and panning
@@ -343,7 +342,9 @@ batch_size = st.number_input("Batch size", value=64)
 
 
 with st.spinner("Loading image classifier"):
-    model = load_model("models/b0_2_epochs_half_data_h5.h5")
+    # model = load_model("models/b0_2_epochs_half_data_h5.h5")
+    # model = load_model("models/sr_sv_nr_v2-l-4e-1f.h5")
+    model = load_model("models/sr_sv_nr_b0_0.4_3t_1f.h5")
 
 if uploaded_video is not None:
     # tempfiles needed for streamlit and opencv to interact properly
@@ -365,9 +366,3 @@ if uploaded_video is not None:
 
         st.plotly_chart(plotly_changepoint(st.session_state["predictions"], my_bkps, fps=fps, true_changepoints=[15, 30, 200]))
         st.success(f"{len(my_bkps)} breakpoints")
-
-
-
-
-
-
