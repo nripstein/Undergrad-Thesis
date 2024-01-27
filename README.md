@@ -1,4 +1,5 @@
 
+
 <H1>AI Computer Vision Software for Undergrad Thesis</H1>
 This repository contains code for my Undergraduate Senior Honours Thesis in the <a href="https://pnb.mcmaster.ca/goldreich-lab/CurrentRes.html#Modeling">Goldreich Lab</a>. I'm developing a computer vision program which can automatically detect how long participants are holding an object in videos. 
 
@@ -30,20 +31,18 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <figcaption>Frontend Preview (some lab equipment blurred)</figcaption>
 </figure>
 
-<h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/f4da48ca9171c976b927834e5edd429a2aac971c/vid_resize_experiments.ipynb">Auto-Zoom Jupyter Notebook</a> (superseded by streamlit preprocess)</h2>
+
+<h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/1069920e8fb79fa7295fc0769b84fa4eac244fad/jupyter%20notebooks/train_nn.ipynb">Train Neural Network</a></h2>
 <ul>
-  <li>Series of functions to automatically zoom videos to the desired size, with the participant's hands in the center</li>
-  <li>Used MediaPipe for hand detection</li>
-  <li>If both the participant's and experimenter's hands are in the frame, focuses on 2 most likely hands (which will be the participants, because the model is trained on ungolved hands.</li>
-  <li>If desired crop region outside of photo, white pixels get added to retain desired output video dimensions</li>
-  <li>TODO:  done</li>
-</ul>
-<h2><a href=https://github.com/nripstein/Undergrad-Thesis/blob/1289033fb0fdacfc70460d9e0328bb9dff3f371e/vid_len_experiments.ipynb">Auto-Split Jupyter Notebook</a> (depreciated, multi-trial vids in use)</h2>
+  <li>Training image classification neural network</li>
+ </ul>
+
+<h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/1069920e8fb79fa7295fc0769b84fa4eac244fad/jupyter%20notebooks/paper_visuals.ipynb">Paper Visuals</a></h2>
 <ul>
-  <li>Series of functions to split long videos of many trials into many videos each containing only one trial</li>
-  <li>Determines when to split videos based on the amount of blue in a given frame (a trial ends when an experimenter, who wears a blue glove, replaces the object for the participant to classify)</li>
-  <li>TODO: done</li>
-</ul>
+  <li>Creating visuals for paper and presentation of results</li>
+    <li>TODO: always room for more helpful visualizations</li>
+ </ul>
+
 <h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/922036882ffbd9af599c081a54eedfc0f20cdcb4/vid_classifier_exp.ipynb">Video with Frame Probability Jupyter Notebook</a></h2>
 <ul>
   <li>Functions to make predictions in a video using a pre-trained model</li>
@@ -61,6 +60,22 @@ This repository contains code for my Undergraduate Senior Honours Thesis in the 
   <li>Add support for edge cases: First or last frame are transition frames</li>
   </ul>
 </ul>
+
+<h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/f4da48ca9171c976b927834e5edd429a2aac971c/vid_resize_experiments.ipynb">Auto-Zoom Jupyter Notebook</a> (superseded by streamlit preprocess)</h2>
+<ul>
+  <li>Series of functions to automatically zoom videos to the desired size, with the participant's hands in the center</li>
+  <li>Used MediaPipe for hand detection</li>
+  <li>If both the participant's and experimenter's hands are in the frame, focuses on 2 most likely hands (which will be the participants, because the model is trained on ungolved hands.</li>
+  <li>If desired crop region outside of photo, white pixels get added to retain desired output video dimensions</li>
+  <li>TODO:  done</li>
+</ul>
+<h2><a href=https://github.com/nripstein/Undergrad-Thesis/blob/1289033fb0fdacfc70460d9e0328bb9dff3f371e/vid_len_experiments.ipynb">Auto-Split Jupyter Notebook</a> (depreciated, multi-trial vids in use)</h2>
+<ul>
+  <li>Series of functions to split long videos of many trials into many videos each containing only one trial</li>
+  <li>Determines when to split videos based on the amount of blue in a given frame (a trial ends when an experimenter, who wears a blue glove, replaces the object for the participant to classify)</li>
+  <li>TODO: done</li>
+</ul>
+
 <h2><a href="https://github.com/nripstein/Undergrad-Thesis/blob/629c88d6e1af0eada75d89550a93fd6de80fea4b/preprocess_pipeline.py">Preprocess Pipeline</a> (Depreciated)</h2>
 <ul>
   <li>.py file to automatically preprocess videos including auto-zoom and auto-crop (as developed in the Jupyter Notebooks)</li>
@@ -91,7 +106,6 @@ Formalizing as a Hidden Markov Model (with <a href="https://en.wikipedia.org/wik
 <li>probably slice off the top. Maybe if aspect ratio more extreme than x, do top slice + some bottom slice and or white pixels around edges</li>
 </ul>
 </li>
-<li>Need to retrain image classification model using all labelled data on EfficentNetB7 for maximum strength (current model is EfficientNetB0)</li>
 <li>Need to evaluate model. <a href="https://arxiv.org/abs/1801.00718">Selective review of offline change point detection methods</a> has methods for evaluating time series changepoint detection (which are sufficient metrics for the final reliability regardless of all intermediate steps)</li>
 
 </ol>
